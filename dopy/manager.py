@@ -625,6 +625,178 @@ class DoManager(object):
         else:
             raise DoError(self.v2_api_required_str)
 
+#load_balancers===================================
+    def show_load_balancer(self, load_balancer_id):
+        if self.api_version == 2:
+            json = self.request('/load_balancers/%s' % load_balancer_id)
+            return json['load_balancer']
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def all_load_balancers(self):
+        if self.api_version == 2:
+            json = self.request('/load_balancers')
+            return json['load_balancers']
+        else:
+            raise DoError(self.v2_api_required_str)
+
+
+    def new_load_balancer(self, name, region, forwarding_rules,
+            algorithm=None, health_check=None, sticky_sessions=None,
+            redirect_http_to_https=False, droplet_ids=None, droplet_tag=None):
+        if self.api_version == 2:
+            params = {
+                    'name': str(name),
+                    'region': str(region),
+                    'forwarding_rules': forwarding_rules,
+            }
+
+            if algorithm:
+                params['algorithm'] = str(algorithm)
+
+            if health_check:
+                params['health_check'] = health_check
+
+            if sticky_sessions:
+                params['sticky_sessions'] = sticky_sessions
+
+            if redirect_http_to_https:
+                params['redirect_http_to_https'] = str(redirect_http_to_https).lower()
+
+            if droplet_ids:
+                if isinstance(droplet_ids, basestring):
+                    droplet_ids = [droplet_ids]
+
+                if type(droplet_ids) == list:
+                    for index in range(len(droplet_ids)):
+                        droplet_ids[index] = str(droplet_ids[index])
+
+                params['droplet_ids'] = droplet_ids
+
+            if droplet_tag:
+                params['droplet_tag'] = str(droplet_tag)
+
+            json = self.request('/load_balancers', params=params, method='POST')
+            created_id = json['load_balancer']['id']
+            return json['load_balancer']
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def edit_load_balancer(self, name, region, forwarding_rules,
+            algorithm=None, health_check=None, sticky_sessions=None,
+            redirect_http_to_https=False, droplet_ids=None, droplet_tag=None
+
+        if self.api_version == 2:
+            params = {
+                    'name': str(name),
+                    'region': str(region),
+                    'forwarding_rules': forwarding_rules,
+            }
+
+            if algorithm:
+                params['algorithm'] = str(algorithm)
+
+            if health_check:
+                params['health_check'] = health_check
+
+            if sticky_sessions:
+                params['sticky_sessions'] = sticky_sessions
+
+            if redirect_http_to_https:
+                params['redirect_http_to_https'] = str(redirect_http_to_https).lower()
+
+            if droplet_ids:
+                if isinstance(droplet_ids, basestring):
+                    droplet_ids = [droplet_ids]
+
+                if type(droplet_ids) == list:
+                    for index in range(len(droplet_ids)):
+                        droplet_ids[index] = str(droplet_ids[index])
+
+                params['droplet_ids'] = droplet_ids
+
+            if droplet_tag:
+                params['droplet_tag'] = str(droplet_tag)
+
+            json = self.request('/load_balancers', params=params, method='PUT')
+            return json['load_balancer']
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def delete_load_balancer(self, load_balancer_id):
+        if self.api_version == 2:
+            self.request('/load_balancers/%s' % load_balancer_id, params=params, method='DELETE')
+            json.pop('status', None)
+            return json
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def add_droplet_to_load_balancer(self, load_balancer_id, droplet_ids=None):
+        if self.api_version == 2:
+            params = {}
+
+            if droplet_ids:
+                if isinstance(droplet_ids, basestring):
+                    droplet_ids = [droplet_ids]
+
+                if type(droplet_ids) == list:
+                    for index in range(len(droplet_ids)):
+                        droplet_ids[index] = str(droplet_ids[index])
+
+                params['droplet_ids'] = droplet_ids
+
+            if droplet_tag:
+                params['droplet_tag'] = str(droplet_tag)
+
+            self.request('/load_balancers/%s/droplets' % load_balancer_id, params=params, method='POST')
+            json.pop('status', None)
+            return json
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def remove_droplet_from_load_balancer(self, load_balancer_id, droplet_ids=None):
+        if self.api_version == 2:
+            if isinstance(droplet_ids, basestring):
+                droplet_ids = [droplet_ids]
+
+            if type(droplet_ids) == list:
+                for index in range(len(droplet_ids)):
+                    droplet_ids[index] = str(droplet_ids[index])
+
+            params = {
+                'droplet_ids': droplet_ids,
+            }
+
+            self.request('/load_balancers/%s/droplets' % load_balancer_id, params=params, method='DELETE')
+            json.pop('status', None)
+            return json
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def add_forwarding_rules(self, load_balancer_id, forwarding_rules=None):
+        if self.api_version == 2:
+            params = {
+                'forwarding_rules': forwarding_rules,
+            }
+
+            self.request('/load_balancers/%s/forwarding_rules' % load_balancer_id, params=params, method='POST')
+            json.pop('status', None)
+            return json
+        else:
+            raise DoError(self.v2_api_required_str)
+
+    def remove_forwarding_rules(self, load_balancer_id, forwarding_rules=None):
+        if self.api_version == 2:
+            params = {
+                'forwarding_rules': forwarding_rules,
+            }
+
+            self.request('/load_balancers/%s/forwarding_rules' % load_balancer_id, params=params, method='DELETE')
+            json.pop('status', None)
+            return json
+        else:
+            raise DoError(self.v2_api_required_str)
+
 #low_level========================================
     def request(self, path, params={}, method='GET'):
         if not path.startswith('/'):
